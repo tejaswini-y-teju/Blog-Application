@@ -29,7 +29,7 @@
     <div class="dashboard-cards">
 
         <div class="stat-card">
-            <h3>12</h3>
+            <h3 id="totalBlogs">0</h3>
             <p>Total Blogs</p>
         </div>
 
@@ -49,23 +49,13 @@
 
     <h2 class="section-title">Your Recent Blogs</h2>
 
-    <div class="blog-container">
-
-        <div class="blog-card">
-            <h3>My First Blog</h3>
-            <p>My experience starting web development.</p>
-            <button>Edit</button>
-        </div>
-
-        <div class="blog-card">
-            <h3>Learning HTML & CSS</h3>
-            <p>Things I learned while building websites.</p>
-            <button>Edit</button>
-        </div>
-
+    <div class="blog-container" id="blogContainer">
+        <p>Loading blogs...</p>
     </div>
 
 </section>
+
+<script src="script.js"></script>
 
 </body>
 </html>

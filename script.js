@@ -80,7 +80,6 @@ async function createBlog(event) {
 
     const title = document.getElementById("blogTitle").value;
     const content = document.getElementById("blogContent").value;
-
     const author = "Tejaswini";
 
     if (!title || !content) {
@@ -117,6 +116,102 @@ async function createBlog(event) {
 }
 
 
-function readBlog() {
-    alert("Blog reading feature opened!");
+// Get and Display All Blogs
+async function loadBlogs() {
+
+    const blogContainer = document.getElementById("blogContainer");
+    const totalBlogs = document.getElementById("totalBlogs");
+
+    // If we are not on dashboard.html, do nothing
+    if (!blogContainer || !totalBlogs) {
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/blogs");
+        const data = await response.json();
+
+        if (response.ok) {
+
+            const blogs = data.blogs;
+
+            totalBlogs.textContent = blogs.length;
+
+            blogContainer.innerHTML = "";
+
+            blogs.forEach((blog) => {
+                blogContainer.innerHTML += `
+                    <div class="blog-card">
+                        <h3>${blog.title}</h3>
+                        <p>${blog.content}</p>
+                        <p><strong>Author:</strong> ${blog.author}</p>
+
+                        <button onclick="viewBlog('${blog._id}')">
+                            Read More
+                        </button>
+                    </div>
+                `;
+            });
+
+        } else {
+            blogContainer.innerHTML = "<p>Unable to load blogs.</p>";
+        }
+
+    } catch (error) {
+        console.error(error);
+        blogContainer.innerHTML = "<p>Unable to connect to the server.</p>";
+    }
 }
+
+
+// View Individual Blog
+function viewBlog(id) {
+    window.location.href = `blog-details.html?id=${id}`;
+}
+
+
+// Run when page loads
+document.addEventListener("DOMContentLoaded", loadBlogs);
+async function loadBlogDetails() {
+
+    const blogDetails = document.getElementById("blogDetails");
+
+    // Run only on blog-details.html
+    if (!blogDetails) {
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/blogs/${id}`
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const blog = data.blog;
+
+            blogDetails.innerHTML = `
+                <div class="blog-card">
+                    <h2>${blog.title}</h2>
+                    <p>${blog.content}</p>
+                    <p><strong>Author:</strong> ${blog.author}</p>
+                    <p><strong>Created:</strong> 
+                        ${new Date(blog.createdAt).toLocaleString()}
+                    </p>
+                </div>
+            `;
+        } else {
+            blogDetails.innerHTML = "<p>Blog not found.</p>";
+        }
+
+    } catch (error) {
+        console.error(error);
+        blogDetails.innerHTML = "<p>Unable to load blog.</p>";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadBlogDetails);

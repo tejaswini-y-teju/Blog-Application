@@ -1,10 +1,11 @@
 const express = require("express");
 const Blog = require("../models/Blog");
+const protect = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // Create Blog API
-router.post("/create", async (req, res) => {
+router.post("/create", protect, async (req, res) => {
     try {
         const { title, content, author } = req.body;
 
@@ -17,7 +18,8 @@ router.post("/create", async (req, res) => {
         const newBlog = new Blog({
             title,
             content,
-            author
+            author,
+            userId: req.user.userId
         });
 
         await newBlog.save();
@@ -35,10 +37,13 @@ router.post("/create", async (req, res) => {
     }
 });
 
-// Get All Blogs API
-router.get("/", async (req, res) => {
+
+// Get User's Blogs API
+router.get("/", protect, async (req, res) => {
     try {
-        const blogs = await Blog.find();
+        const blogs = await Blog.find({
+            userId: req.user.userId
+        });
 
         res.status(200).json({
             blogs: blogs
@@ -51,6 +56,7 @@ router.get("/", async (req, res) => {
         });
     }
 });
+
 
 // Get Single Blog by ID
 router.get("/:id", async (req, res) => {
@@ -74,13 +80,18 @@ router.get("/:id", async (req, res) => {
         });
     }
 });
+
+
 // Update Blog API
-router.put("/:id", async (req, res) => {
+router.put("/:id", protect, async (req, res) => {
     try {
         const { title, content, author } = req.body;
 
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            req.params.id,
+        const updatedBlog = await Blog.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                userId: req.user.userId
+            },
             {
                 title,
                 content,
@@ -94,7 +105,7 @@ router.put("/:id", async (req, res) => {
 
         if (!updatedBlog) {
             return res.status(404).json({
-                message: "Blog not found"
+                message: "Blog not found or you are not authorized"
             });
         }
 
@@ -110,14 +121,19 @@ router.put("/:id", async (req, res) => {
         });
     }
 });
+
+
 // Delete Blog API
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", protect, async (req, res) => {
     try {
-        const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+        const deletedBlog = await Blog.findOneAndDelete({
+            _id: req.params.id,
+            userId: req.user.userId
+        });
 
         if (!deletedBlog) {
             return res.status(404).json({
-                message: "Blog not found"
+                message: "Blog not found or you are not authorized"
             });
         }
 
@@ -133,4 +149,6 @@ router.delete("/:id", async (req, res) => {
         });
     }
 });
+
+
 module.exports = router;

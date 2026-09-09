@@ -1,3 +1,8 @@
+const API_URL = "https://blog-application-69lz.onrender.com";
+
+
+// ==================== LOGIN ====================
+
 async function loginUser(event) {
     event.preventDefault();
 
@@ -5,7 +10,7 @@ async function loginUser(event) {
     const password = document.getElementById("loginPassword").value;
 
     try {
-        const response = await fetch("http://https://blog-application-69lz.onrender.com/api/users/login", {
+        const response = await fetch(`${API_URL}/api/users/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -35,6 +40,8 @@ async function loginUser(event) {
 }
 
 
+// ==================== REGISTER ====================
+
 async function registerUser(event) {
     event.preventDefault();
 
@@ -50,7 +57,7 @@ async function registerUser(event) {
     }
 
     try {
-        const response = await fetch("http://localhost:5000/api/users/register", {
+        const response = await fetch(`${API_URL}/api/users/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -78,6 +85,8 @@ async function registerUser(event) {
 }
 
 
+// ==================== CREATE BLOG ====================
+
 async function createBlog(event) {
     event.preventDefault();
 
@@ -99,7 +108,7 @@ async function createBlog(event) {
     }
 
     try {
-        const response = await fetch("http://localhost:5000/api/blogs/create", {
+        const response = await fetch(`${API_URL}/api/blogs/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -128,7 +137,8 @@ async function createBlog(event) {
 }
 
 
-// Get and Display User's Blogs
+// ==================== GET BLOGS ====================
+
 async function loadBlogs() {
 
     const blogContainer = document.getElementById("blogContainer");
@@ -146,7 +156,7 @@ async function loadBlogs() {
     }
 
     try {
-        const response = await fetch("http://localhost:5000/api/blogs", {
+        const response = await fetch(`${API_URL}/api/blogs`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -194,15 +204,14 @@ async function loadBlogs() {
 }
 
 
-// View Individual Blog
+// ==================== VIEW BLOG ====================
+
 function viewBlog(id) {
     window.location.href = `blog-details.html?id=${id}`;
 }
 
 
-// Run when page loads
-document.addEventListener("DOMContentLoaded", loadBlogs);
-
+// ==================== BLOG DETAILS ====================
 
 async function loadBlogDetails() {
 
@@ -217,7 +226,7 @@ async function loadBlogDetails() {
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/blogs/${id}`
+            `${API_URL}/api/blogs/${id}`
         );
 
         const data = await response.json();
@@ -230,7 +239,7 @@ async function loadBlogDetails() {
                     <h2>${blog.title}</h2>
                     <p>${blog.content}</p>
                     <p><strong>Author:</strong> ${blog.author}</p>
-                    <p><strong>Created:</strong> 
+                    <p><strong>Created:</strong>
                         ${new Date(blog.createdAt).toLocaleString()}
                     </p>
                 </div>
@@ -245,10 +254,9 @@ async function loadBlogDetails() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", loadBlogDetails);
 
+// ==================== PROTECT DASHBOARD ====================
 
-// Protect Dashboard
 function checkLogin() {
     const token = localStorage.getItem("token");
 
@@ -257,12 +265,9 @@ function checkLogin() {
     }
 }
 
-if (window.location.pathname.includes("dashboard.html")) {
-    checkLogin();
-}
 
+// ==================== LOGOUT ====================
 
-// Logout User
 function logoutUser() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -273,8 +278,10 @@ function logoutUser() {
 }
 
 
-// Display logged-in user's name and profile
+// ==================== DISPLAY USER ====================
+
 function displayUserName() {
+
     const userName = document.getElementById("userName");
     const profileName = document.getElementById("profileName");
     const profileEmail = document.getElementById("profileEmail");
@@ -297,10 +304,9 @@ function displayUserName() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", displayUserName);
 
+// ==================== DELETE BLOG ====================
 
-// Delete Blog
 async function deleteBlog() {
 
     const params = new URLSearchParams(window.location.search);
@@ -324,7 +330,7 @@ async function deleteBlog() {
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/blogs/${id}`,
+            `${API_URL}/api/blogs/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -346,4 +352,15 @@ async function deleteBlog() {
         console.error(error);
         alert("Unable to connect to the server.");
     }
+}
+
+
+// ==================== PAGE LOAD ====================
+
+document.addEventListener("DOMContentLoaded", loadBlogs);
+document.addEventListener("DOMContentLoaded", loadBlogDetails);
+document.addEventListener("DOMContentLoaded", displayUserName);
+
+if (window.location.pathname.includes("dashboard.html")) {
+    checkLogin();
 }
